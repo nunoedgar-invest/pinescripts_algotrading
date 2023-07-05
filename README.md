@@ -1,2 +1,3 @@
-# pinescripts_algotrading
+# Pinescripts for Algorithmic Trading
+
 Writing basic Pine Script algorithms for TradingView expereiments
