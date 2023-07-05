@@ -1,18 +1,19 @@
-//@version=4
+//@version=5
 strategy("Moving Average Crossover", overlay=true)
 
-// Define strategy inputs
-fast_length = input(10, title="Fast MA Length")
-slow_length = input(20, title="Slow MA Length")
+// Define input parameters
+fastLength = input(10, title="Fast MA Length")
+slowLength = input(20, title="Slow MA Length")
 
 // Calculate moving averages
-fast_ma = sma(close, fast_length)
-slow_ma = sma(close, slow_length)
+fastMA = ta.sma(close, fastLength)
+slowMA = ta.sma(close, slowLength)
 
 // Define strategy conditions
-enter_long = crossover(fast_ma, slow_ma)
-exit_long = crossunder(fast_ma, slow_ma)
+enterLong = ta.crossover(fastMA, slowMA)
+exitLong = ta.crossunder(fastMA, slowMA)
 
 // Execute strategy
-strategy.entry("Long", strategy.long, when=enter_long)
-strategy.exit("Exit", "Long", when=exit_long)
+strategy.entry("Buy", strategy.long, when=enterLong)
+strategy.close("Buy", when=exitLong)
+
