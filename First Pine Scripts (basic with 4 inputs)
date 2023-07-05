@@ -1,0 +1,34 @@
+//@version=5
+strategy("Conditional Trading Algorithm", overlay=true)
+
+// Inputs
+input int fastPeriod = 10
+input int slowPeriod = 20
+input float stopLossPercent = 1.0
+input float takeProfitPercent = 2.0
+
+// Calculate moving averages
+fastMA = ta.sma(close, fastPeriod)
+slowMA = ta.sma(close, slowPeriod)
+
+// Initialize variables
+var bool longCondition = false
+var bool shortCondition = false
+
+// Define conditions
+if ta.crossover(fastMA, slowMA)
+    longCondition := true
+else if ta.crossunder(fastMA, slowMA)
+    shortCondition := true
+
+// Place orders
+if longCondition
+    strategy.entry("Buy", strategy.long)
+    strategy.exit("Sell", "Buy", stop=close * (1 - stopLossPercent / 100), limit=close * (1 + takeProfitPercent / 100))
+else if shortCondition
+    strategy.entry("Sell", strategy.short)
+    strategy.exit("Cover", "Sell", stop=close * (1 + stopLossPercent / 100), limit=close * (1 - takeProfitPercent / 100))
+
+// Plot moving averages
+plot(fastMA, color=color.blue, title="Fast MA")
+plot(slowMA, color=color.red, title="Slow MA")
