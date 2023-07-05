@@ -1,0 +1,39 @@
+//@version=5
+strategy("Risk Management Example", overlay=true)
+
+// Inputs
+input float riskPercent = 1.0  // Risk percentage per trade
+input float stopLossPercent = 0.5  // Stop loss percentage
+input float takeProfitPercent = 1.0  // Take profit percentage
+input int atrLength = 14  // ATR calculation period
+
+// Calculate ATR
+atrValue = ta.atr(atrLength)
+
+// Calculate position size based on risk percentage
+riskAmount = strategy.equity * riskPercent / 100
+positionSize = riskAmount / atrValue
+
+// Calculate stop loss and take profit levels
+stopLoss = ta.valuewhen(strategy.position_size > 0, close, 0) * (1 - stopLossPercent / 100)
+takeProfit = ta.valuewhen(strategy.position_size > 0, close, 0) * (1 + takeProfitPercent / 100)
+
+// Entry condition (example: simple moving average crossover)
+fastMA = ta.sma(close, 10)
+slowMA = ta.sma(close, 20)
+enterLong = ta.crossover(fastMA, slowMA)
+enterShort = ta.crossunder(fastMA, slowMA)
+
+// Exit conditions (example: stop loss or take profit)
+exitLong = ta.crossunder(close, stopLoss) or ta.crossunder(close, takeProfit)
+exitShort = ta.crossover(close, stopLoss) or ta.crossover(close, takeProfit)
+
+// Strategy entry and exit logic
+if enterLong
+    strategy.entry("Buy", strategy.long, qty=positionSize)
+if enterShort
+    strategy.entry("Sell", strategy.short, qty=positionSize)
+if exitLong
+    strategy.close("Buy")
+if exitShort
+    strategy.close("Sell")
